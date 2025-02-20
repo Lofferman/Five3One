@@ -21,36 +21,51 @@ class calcUtil {
       return {'reps': reps[metric]![index], 'weight': weight};
     });
   }
-}
 
-class WeightPlateUtil {
-  // List of available plates in pounds
-  static const List<num> plateWeights = [
-    45,
-    25,
-    10,
-    5,
-    2
-  ]; // 45lbs, 25lbs, 10lbs, 5lbs, 2.5lbs
+  static Map<String, num> calculatePlates(num targetWeight) {
+    double barWeight = 45.0; // Weight of the barbell in pounds
+    double totalWeight =
+        targetWeight - barWeight; // The weight to be added with plates
 
-  // Function to calculate the plates required for a given weight on one side of the bar
-  static Map<num, num> calculatePlates(num targetWeight) {
-    // Subtract the weight of the bar (45 lbs)
-    targetWeight -= 45;
-
-    // Initialize a map to hold the number of plates required for each plate size
-    Map<num, num> platesRequired = {45: 0, 25: 0, 10: 0, 5: 0, 2: 0};
-
-    // Loop through the available plates and calculate how many we need
-    for (num plate in plateWeights) {
-      if (targetWeight <= 0) break;
-      num count = (targetWeight ~/ plate).toInt(); // Number of plates that fit
-      platesRequired[plate] = count;
-      targetWeight -= plate * count; // Deduct the weight accounted for
+    if (totalWeight < 0) {
+      throw Exception(
+          "Target weight cannot be less than the weight of the barbell.");
     }
 
-    // Return the number of plates for each size (only for plates that are used)
-    platesRequired.removeWhere((key, value) => value == 0);
-    return platesRequired;
+    // Divide by 2 to get the weight for one side of the barbell
+    totalWeight /= 2;
+
+    // Define the plate sizes
+    List<double> plateSizes = [45.0, 25.0, 10.0, 5.0, 2.5];
+    Map<String, double> platesNeeded = {
+      '45': 0,
+      '25': 0,
+      '10': 0,
+      '5': 0,
+      '2.5': 0
+    };
+
+    // Loop through the plate sizes and calculate how many plates we need for one side
+    for (var plate in plateSizes) {
+      double plateCount = (totalWeight / plate).floorToDouble();
+      platesNeeded[plate.toString()] = plateCount;
+      totalWeight -= plateCount * plate;
+
+      // Round to the nearest .5 if remaining weight is less than 0.5
+      totalWeight = (totalWeight * 2).roundToDouble() / 2;
+    }
+
+    // Ensure the sum matches the total weight to avoid rounding issues
+    if (totalWeight > 0) {
+      double remainingWeight = (totalWeight * 2).roundToDouble() / 2;
+      if (remainingWeight > 0) {
+        platesNeeded['2.5'] = platesNeeded['2.5']! + remainingWeight / 2.5;
+      }
+    }
+
+    //Remove if the the plate count is 0
+    platesNeeded.removeWhere((k, v) => v == 0);
+
+    return platesNeeded;
   }
 }
