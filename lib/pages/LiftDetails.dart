@@ -4,110 +4,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
-// CARD WIDGET
-class GeneralCard extends StatelessWidget {
-  const GeneralCard({super.key, required this.cardName});
-
-  final String cardName;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 150,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  cardName,
-                  style: TextStyle(fontSize: 20),
-                ),
-              ],
-            ),
-          ],
-        ));
-  }
-}
+import '../styles/styles.dart';
 
 //LIFT VIEW WIDGET
-class LiftView extends StatelessWidget {
+class LiftView extends StatefulWidget {
   const LiftView({super.key, required this.lift});
 
   final String lift;
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 1,
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(lift),
-        ),
-        body: TabBarView(
-          children: <Widget>[
-            LiftDetails(lift: lift, metric: "5/5/5"),
-            LiftDetails(lift: lift, metric: "3/3/3"),
-            LiftDetails(lift: lift, metric: "5/3/1"),
-            LiftDetails(lift: lift, metric: "Deload"),
-          ],
-        ),
-        bottomNavigationBar: const TabBar(
-          textScaler: TextScaler.linear(1.5),
-          tabs: <Widget>[
-            Text("5/5/5+"),
-            Text("3/3/3+"),
-            Text("5/3/1+"),
-            Text("Deload"),
-          ],
-        ),
-      ),
-    );
-  }
+  State<LiftView> createState() => _LiftViewState();
 }
 
-// CARD WIDGET
-
-class LiftDetails extends StatefulWidget {
-  const LiftDetails({super.key, required this.lift, required this.metric});
-
-  final String lift;
-  final String metric;
-
-  @override
-  State<LiftDetails> createState() => _LiftDetailsState();
-}
-
-class _LiftDetailsState extends State<LiftDetails> {
-  final TextEditingController textfield = TextEditingController();
-  List<Map<String, dynamic>> repDetails = [];
-
-  num maxWeight = 0.0;
-
-  Box<LiftData> liftDataBox = Hive.box<LiftData>('liftData');
+class _LiftViewState extends State<LiftView> {
+  TextEditingController? maxField;
+  final FocusNode maxCodeCtrlFocusNode = FocusNode();
+  late num maxWeight;
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); // to have context
+    maxField = TextEditingController(text: '135');
     num? storedWeight = _getDBvals();
-    _setMaxWeight(storedWeight ?? maxWeight);
+    _setMaxWeight(storedWeight);
+    if (storedWeight != null) maxCodeCtrlFocusNode.requestFocus();
+    setState(() {});
   }
 
-  void _setMaxWeight(num weight) {
-    setState(() {
-      repDetails = calcUtil.calcWeights(widget.metric, weight);
-      _setDB(weight, widget.lift);
-    });
+  @override
+  void dispose() {
+    super.dispose();
+    maxField?.dispose();
+  }
+
+  void _setMaxWeight(num? weight) {
+    if (weight != null) {
+      setState(() {
+        maxWeight = weight;
+        _setDB(weight, widget.lift);
+      });
+    }
   }
 
   _getDBvals() {
     num? storedMax;
-    storedMax = liftDataBox.get(widget.lift)?.liftTotal;
-    maxWeight = storedMax ?? 0;
-    textfield.text = maxWeight.toString();
+    storedMax = liftDataBox.get(widget.lift)?.liftTotal ?? 135;
+    print(storedMax);
+    maxWeight = (storedMax);
+    maxField!.text = storedMax.toString() ?? '';
   }
 
   void _setDB(weight, lift) async {
@@ -119,45 +63,131 @@ class _LiftDetailsState extends State<LiftDetails> {
     await liftDataBox.put(userdata.liftType, userdata);
   }
 
+  Box<LiftData> liftDataBox = Hive.box<LiftData>('liftData');
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      spacing: 2,
-      children: [
-        Container(
-          child: Center(
-            child: Card.filled(
-              margin: EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  SizedBox(
-                      width: 50,
-                      child: TextFormField(
-                        maxLength: 4,
-                        controller: textfield,
+    return DefaultTabController(
+      initialIndex: 0,
+      length: 4,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(200.0), // here the desired height
+          child: AppBar(
+            iconTheme: IconThemeData(
+              color: colors.general_font_color, //change your color here
+            ),
+            backgroundColor: colors.secondary,
+            centerTitle: true,
+            title: Text(
+              widget.lift,
+              style: TextStyle(
+                color: colors.general_font_color,
+              ),
+            ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(0),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  // ,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                        textAlign: TextAlign.center,
+                        cursorColor: Colors.white,
+                        maxLength: 6,
+                        controller: maxField,
+                        focusNode: maxCodeCtrlFocusNode,
                         autovalidateMode: AutovalidateMode.always,
-                        keyboardType: TextInputType.number,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+(?:\.\d{0,2})?$'))
                         ],
                         decoration: const InputDecoration(
-                          hintText: '',
+                          hintText: 'Enter weight',
                           labelText: '',
+                          counterText: "",
+                          hintStyle: TextStyle(color: Colors.white30),
+                          focusColor: Colors.white,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
                         ),
+                        style: TextStyle(
+                            fontSize: 40.0, color: colors.general_font_color),
                         onChanged: (val) => setState(() {
-                          val != ''
-                              ? (_setMaxWeight(num.parse(val)))
-                              : _setMaxWeight(0);
-                        }),
-                      ))
-                ],
-              ),
+                              _setMaxWeight(num.parse(val));
+                            })),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    const TabBar(
+                      textScaler: TextScaler.linear(1.5),
+                      labelColor: Colors.white,
+                      indicatorColor: colors.secondary,
+                      dividerColor: Colors.transparent,
+                      unselectedLabelColor: Colors.white60,
+                      tabs: <Widget>[
+                        Text("5/5/5+"),
+                        Text("3/3/3+"),
+                        Text("5/3/1+"),
+                        Text("Deload"),
+                      ],
+                    ),
+                  ]),
             ),
           ),
         ),
-        SetSection(repDetails: repDetails)
-      ],
+        body: Container(
+          color: colors.primary,
+          child: TabBarView(
+            children: <Widget>[
+              LiftDetails(
+                  lift: widget.lift, metric: "5/5/5", weight: maxWeight),
+              LiftDetails(
+                  lift: widget.lift, metric: "3/3/3", weight: maxWeight),
+              LiftDetails(
+                  lift: widget.lift, metric: "5/3/1", weight: maxWeight),
+              LiftDetails(
+                  lift: widget.lift, metric: "Deload", weight: maxWeight),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+}
+
+// CARD WIDGET
+
+class LiftDetails extends StatefulWidget {
+  const LiftDetails(
+      {super.key,
+      required this.lift,
+      required this.metric,
+      required this.weight});
+
+  final String lift;
+  final String metric;
+  final num weight;
+
+  @override
+  State<LiftDetails> createState() => _LiftDetailsState();
+}
+
+class _LiftDetailsState extends State<LiftDetails> {
+  List<Map<String, dynamic>> repDetails = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      SizedBox(
+        height: 10,
+      ),
+      SetSection(repDetails: calcUtil.calcWeights(widget.metric, widget.weight))
+    ]);
   }
 }
 
@@ -174,7 +204,6 @@ class SetSection extends StatefulWidget {
 }
 
 class _SetSectionState extends State<SetSection> {
-  List<num> progressInd = List.empty();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -182,20 +211,7 @@ class _SetSectionState extends State<SetSection> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (Map<String, dynamic> item in widget.repDetails)
-          Container(
-              color: Colors.green,
-              child:
-                  // ElevatedButton(
-                  //     style: ElevatedButton.styleFrom(minimumSize: Size(200, 60)),
-                  //     onPressed: () => {
-                  //           // progressInd
-                  //           //         .any((e) => e == widget.repDetails.indexOf(item))
-                  //           //     ? progressInd.remove(widget.repDetails.indexOf(item))
-                  //           //     : progressInd.add(widget.repDetails.indexOf(item))
-                  //         },
-                  //     child:
-                  LiftDetailsCard(
-                      repRange: item['reps'], weight: item['weight'])),
+          LiftDetailsCard(repRange: item['reps'], weight: item['weight']),
         // )
       ],
     );
@@ -213,10 +229,14 @@ class LiftDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card.filled(
-      margin: EdgeInsets.all(10),
-      child: LiftDetailsCardContent(
-        repRange: repRange,
-        weight: weight,
+      color: colors.tertiary,
+      margin: EdgeInsets.all(8),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        child: LiftDetailsCardContent(
+          repRange: repRange,
+          weight: weight,
+        ),
       ),
     );
   }
@@ -236,52 +256,92 @@ class LiftDetailsCardContent extends StatelessWidget {
     if (weight > 45) {
       weightMap = calcUtil.calculatePlates(weight);
     }
-    return SizedBox(
-      height: 150,
-      width: 20,
-      child: Row(
-        spacing: 50,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10.0,
-            children: [
-              Text(
-                '$weight',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10.0,
-            children: [
-              Text(
-                'x $repRange',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 200,
-            width: 100,
-            child: ListView.builder(
+    return Row(children: [
+      Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 10.0,
+          children: [
+            Text(
+              '$weight',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                  color: colors.general_font_color),
+            ),
+            Text(
+              'lbs',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: colors.general_font_color),
+            ),
+          ],
+        ),
+      ),
+      Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 10.0,
+          children: [
+            Text(
+              '$repRange',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                  color: colors.general_font_color),
+            ),
+            Text(
+              'reps',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: colors.general_font_color),
+            ),
+          ],
+        ),
+      ),
+      Flexible(
+          flex: 1,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
               itemCount: weightMap.length,
               itemBuilder: (BuildContext context, int index) {
                 String key = weightMap.keys.elementAt(index);
-                return Column(
-                  children: <Widget>[
-                    Text("$key - ${weightMap[key]}"),
-                    Divider(
-                      height: 2.0,
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(key.replaceAll('.0', ''),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: colors.general_font_color)),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      '${weightMap[key]?.round()}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: colors.general_font_color),
                     ),
                   ],
                 );
               },
             ),
-          )
-        ],
-      ),
-    );
+            Text(
+              'plates per side',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: colors.general_font_color),
+            ),
+          ]))
+    ]);
   }
 }

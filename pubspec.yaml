@@ -30,11 +30,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: 
-  google_fonts:
-  hive: 
-  hive_flutter: 
 
+  #fonts
+  google_fonts:
+
+  #For local storage
+  shared_preferences:
+  hive:
+  hive_flutter:
+
+  #slash screen
+  flutter_native_splash: ^2.4.4
+
+  #for exporting data
+  path_provider:
+  excel: ^4.0.6
+  syncfusion_flutter_xlsio:
+  permission_handler:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -43,16 +55,25 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:
+  flutter_launcher_icons: ^0.13.1
 
-  hive_generator: 
-  build_runner: 
-  
+flutter_launcher_icons:
+  android: true
+  ios: true
+  adaptive_icon_foreground: "assets/images/icon_launcher_foreground.png"
+  adaptive_icon_background: "#ffffff"
+  image_path: "assets/images/icon.png"
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  icons_launcher: ^3.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -66,9 +87,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

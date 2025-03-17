@@ -17,7 +17,10 @@ samples, guidance on mobile development, and a full API reference.
 
 
 ## TODO:
- - [Save totals to with Hive](https://github.com/isar/hive)
-    -[Hive Example](https://github.com/shashiben/Flutter-anime)
+ - [Save totals to with Hive](https://github.com/isar/hive) DONE
+    -[Hive Example](https://github.com/shashiben/Flutter-anime) 
  - [Embed with web_embedding](https://github.com/flutter/samples/tree/main/web_embedding)
  - [Embed with Iframe](https://docs.flutter.dev/platform-integration/web/embedding-flutter-web)
+ - [Add Splash Screen](https://pub.dev/packages/flutter_native_splash)
+ - [Add Introduction Screen](https://pub.dev/packages/introduction_screen)
+ - [Add Icon](https://pub.dev/packages/introduction_screen)

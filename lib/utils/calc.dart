@@ -1,6 +1,26 @@
+import 'dart:developer';
+
+import 'package:hive/hive.dart';
+
+import '../model/user_settings.dart';
+
 class calcUtil {
   static List<Map<String, dynamic>> calcWeights(String metric, num maxWeight) {
-    num trainingMax = maxWeight * 0.9;
+    Box<UserSettings> userSettingsBox = Hive.box<UserSettings>('userSettings');
+
+    // rounding: up, down, nearest
+    // precision: 2.5, 5.0, 10.0
+    // trainingMaxPercent: % value (0.##)
+    // take stored user setting else take default
+    inspect(userSettingsBox.get('userSettings'));
+    Map<String, dynamic> settings = {
+      'rounding': userSettingsBox.get('userSettings')?.rounding ?? 'up',
+      'precision': userSettingsBox.get('userSettings')?.precision ?? 5.0,
+      'trainingMaxPercent':
+          userSettingsBox.get('userSettings')?.trainingMaxPercent ?? 0.95
+    };
+
+    num trainingMax = maxWeight * settings['trainingMaxPercent'];
     Map<String, List<num>> percentages = {
       '5/5/5': [0.65, 0.75, 0.85],
       '3/3/3': [0.70, 0.80, 0.90],
@@ -15,9 +35,19 @@ class calcUtil {
     };
 
     return List.generate(3, (index) {
-      num weight = (trainingMax * percentages[metric]![index]).roundToDouble();
-      weight = (weight / 5).round() * 5;
-      //round to the nearest 5lbs
+      num weight = (trainingMax * percentages[metric]![index]);
+      num roundingPrecision = settings['precision'] ?? 5;
+
+      if (settings['rounding'] == 'up') {
+        weight = (weight / roundingPrecision).ceil() * roundingPrecision;
+      }
+      if (settings['rounding'] == 'nearest') {
+        weight = (weight / roundingPrecision).round() * roundingPrecision;
+      }
+      if (settings['rounding'] == 'down') {
+        weight = (weight / roundingPrecision).floor() * roundingPrecision;
+      }
+
       return {'reps': reps[metric]![index], 'weight': weight};
     });
   }
@@ -66,6 +96,13 @@ class calcUtil {
     //Remove if the the plate count is 0
     platesNeeded.removeWhere((k, v) => v == 0);
 
-    return platesNeeded;
+    Map<String, num> newmap = {};
+    var keys = [...platesNeeded.keys]
+      ..sort((b, a) => num.parse(a).compareTo(num.parse(b)));
+    for (String key in keys) {
+      newmap[key] = platesNeeded[key] as num;
+    }
+
+    return newmap;
   }
 }

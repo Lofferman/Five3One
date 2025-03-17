@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
+
 part 'lift_data.g.dart';
+//run to generate :  flutter packages pub run build_runner build
 
 @HiveType(typeId: 0)
 class LiftData {
