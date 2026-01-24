@@ -1,6 +1,22 @@
 # A Personalized 5/3/1 Application
 ### A Tool Built for Simplicity
 
+## Table of Contents
+
+- [Overview](#overview)
+- [What Is the 5/3/1 Method?](#what-is-the-531-method)
+- [Key Features](#key-features)
+  - [Squat, Bench, Deadlift, and Overhead Press Modules](#1-squat-bench-deadlift-and-overhead-press-modules)
+  - [Plate Calculator](#2-plate-calculator)
+  - [Settings & Customization](#3-settings--customization)
+- [Progressive Improvement](#progressive-improvement)
+- [Conclusion](#conclusion)
+- [Gallery](#gallery)
+
+---
+
+## Overview
+
 As a hobbyist powerlifter with over a decade of lifting experience—and the last three years focused specifically on powerlifting—I’ve come to appreciate the importance of **technique and form over simply chasing heavier weights**.
 
 One thing that consistently frustrated me, though, was the mental math involved in preparing the bar for my lifts. Calculating plate requirements—especially when following the **5/3/1 program**—was always a hassle. I wanted to conserve mental energy for the lifts themselves, not spend it doing calculations.
@@ -134,3 +150,17 @@ As a powerlifter who prioritizes **technique over mental math**, this applicatio
 By automating calculations for working weights, rep schemes, and plate loading, the app lets you focus entirely on what matters most—**lifting well and getting stronger**.
 
 Whether you’re strictly following 5/3/1 or building your own routine, this tool removes friction and keeps your attention where it belongs.
+
+---
+
+## Gallery
+
+Below are screenshots of the mobile experience.
+<p align="center">
+<img src="https://github.com/Lofferman/Five3One/blob/master/five3one-1.jpg" alt="five3one main screen" width="300"/>
+<img src="https://github.com/Lofferman/Five3One/blob/master/five3one-2.jpg" alt="five3one squat screen" width="300"/>
+</p>
+<p align="center">
+<img src="https://github.com/Lofferman/Five3One/blob/master/five3one-3.jpg" alt="five3one plate calc screen" width="300"/>
+<img src="https://github.com/Lofferman/Five3One/blob/master/five3one-4.jpg" alt="five3one settings screen" width="300"/>
+</p>
