@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "team": {
+    "name": "My Awesome Team",
+    "tagline": "Indie game studio building immersive worlds",
+    "details": "",
+    "lookingForRoles": [
+      {
+        "role": "UX",
+        "experience": "intermediate",
+        "commitment": "part-time",
+        "paid": false,
+        "description":""
+      },
+      {
+        "role": "Mobile Developer",
+        "experience": "senior",
+        "commitment": "part-time",
+        "paid": false,
+        "description":"Experice with Flutter is a plus"
+      }
+    ],
+    "thumbnail": "https://github.com/Lofferman/Five3One/blob/master/assets/images/icon.png",
+  }
+}
