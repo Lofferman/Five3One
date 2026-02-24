@@ -4,8 +4,8 @@
     "name": "Five3One",
     "tagline": "A strength-building companion application designed around the 5/3/1 program, a proven training protocol centered on progressive overload. This program prioritizes gradual, consistent muscle and strength development for sustained growth.",
     "details": "",
-    "techStack": ["Flutter", "Dart"]
-    "thumbnail": "https://raw.githubusercontent.com/Lofferman/Five3One/refs/heads/master/assets/images/icon.png"
+    "techStack": ["Flutter", "Dart"],
+    "thumbnail": "https://raw.githubusercontent.com/Lofferman/Five3One/refs/heads/master/assets/images/icon.png",
     "lookingForRoles": [
       {
         "role": "UX",
